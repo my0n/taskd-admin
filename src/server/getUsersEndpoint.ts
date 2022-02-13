@@ -1,7 +1,8 @@
 import { Static, Type } from "@sinclair/typebox";
 import { getUsers, orgExists } from "../files/fileApi";
 import { isValidIdentifier } from "../validation/isValidIdentifier";
-import { EndpointValidationError } from "./EndpointValidationErrorType";
+import { EndpointBadRequestError } from "./EndpointBadRequestErrorType";
+import { EndpointNotFoundError } from "./EndpointNotFoundErrorType";
 import { EndpointUser } from "./EndpointUserType";
 import { FastifyServerType } from "./FastifyServerType";
 
@@ -15,14 +16,8 @@ const UserListReply = Type.Union([
     statusCode: Type.Literal(200),
     users: Type.Array(EndpointUser)
   }),
-  Type.Object({
-    statusCode: Type.Literal(400),
-    error: EndpointValidationError
-  }),
-  Type.Object({
-    statusCode: Type.Literal(404),
-    error: EndpointValidationError
-  })
+  EndpointNotFoundError,
+  EndpointBadRequestError
 ]);
 type UserListReplyType = Static<typeof UserListReply>;
 
@@ -35,9 +30,8 @@ export const getUsersEndpoint = (server: FastifyServerType) => {
       reply.status(400);
       return {
         statusCode: 400 as const,
-        error: {
-          message: "org is not a valid organization name"
-        }
+        error: "Bad Request",
+        message: "org is not a valid organization name"
       };
     }
 
@@ -45,9 +39,8 @@ export const getUsersEndpoint = (server: FastifyServerType) => {
       reply.status(404);
       return {
         statusCode: 404 as const,
-        error: {
-          message: "org does not exist"
-        }
+        error: "Not Found",
+        message: "org does not exist"
       };
     }
 

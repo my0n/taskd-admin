@@ -1,7 +1,8 @@
 import { Static, Type } from "@sinclair/typebox";
 import { getCertPem, orgExists, userExists } from "../files/fileApi";
 import { isValidIdentifier } from "../validation/isValidIdentifier";
-import { EndpointValidationError } from "./EndpointValidationErrorType";
+import { EndpointBadRequestError } from "./EndpointBadRequestErrorType";
+import { EndpointNotFoundError } from "./EndpointNotFoundErrorType";
 import { FastifyServerType } from "./FastifyServerType";
 
 const UserCertPemParams = Type.Object({
@@ -12,14 +13,8 @@ type UserCertPemParamsType = Static<typeof UserCertPemParams>;
 
 const UserCertPemReply = Type.Union([
   Type.String(),
-  Type.Object({
-    statusCode: Type.Literal(400),
-    error: EndpointValidationError
-  }),
-  Type.Object({
-    statusCode: Type.Literal(404),
-    error: EndpointValidationError
-  })
+  EndpointNotFoundError,
+  EndpointBadRequestError
 ]);
 type UserCertPemReplyType = Static<typeof UserCertPemReply>;
 
@@ -32,9 +27,8 @@ export const getUserCertPemEndpoint = (server: FastifyServerType) => {
       reply.status(400);
       return {
         statusCode: 400 as const,
-        error: {
-          message: "org is not a valid organization name"
-        }
+        error: "Bad Request",
+        message: "org is not a valid organization name"
       };
     }
 
@@ -42,9 +36,8 @@ export const getUserCertPemEndpoint = (server: FastifyServerType) => {
       reply.status(400);
       return {
         statusCode: 400 as const,
-        error: {
-          message: "uuid is not a valid uuid"
-        }
+        error: "Bad Request",
+        message: "uuid is not a valid uuid"
       };
     }
 
@@ -52,9 +45,8 @@ export const getUserCertPemEndpoint = (server: FastifyServerType) => {
       reply.status(404);
       return {
         statusCode: 404 as const,
-        error: {
-          message: "org does not exist"
-        }
+        error: "Not Found",
+        message: "org does not exist"
       };
     }
 
@@ -62,9 +54,8 @@ export const getUserCertPemEndpoint = (server: FastifyServerType) => {
       reply.status(404);
       return {
         statusCode: 404 as const,
-        error: {
-          message: "uuid does not exist"
-        }
+        error: "Not Found",
+        message: "uuid does not exist"
       };
     }
 
@@ -74,9 +65,8 @@ export const getUserCertPemEndpoint = (server: FastifyServerType) => {
       reply.status(404);
       return {
         statusCode: 404 as const,
-        error: {
-          message: "cert.pem does not exist for this user"
-        }
+        error: "Not Found",
+        message: "cert.pem does not exist for this user"
       };
     }
 

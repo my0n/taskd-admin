@@ -1,9 +1,9 @@
 import { Static, Type } from "@sinclair/typebox";
 import { isValidIdentifier } from "../validation/isValidIdentifier";
-import { EndpointValidationError } from "./EndpointValidationErrorType";
 import { FastifyServerType } from "./FastifyServerType";
 import { createOrg } from "../taskd/taskdApi";
 import { EndpointOrg } from "./EndpointOrgType";
+import { EndpointBadRequestError } from "./EndpointBadRequestErrorType";
 
 const CreateOrgBody = Type.Object({
   name: Type.String()
@@ -15,10 +15,7 @@ const CreateOrgReply = Type.Union([
     statusCode: Type.Literal(200),
     org: EndpointOrg
   }),
-  Type.Object({
-    statusCode: Type.Literal(400),
-    error: EndpointValidationError
-  })
+  EndpointBadRequestError
 ]);
 type CreateOrgReplyType = Static<typeof CreateOrgReply>;
 
@@ -31,9 +28,8 @@ export const createOrgEndpoint = (server: FastifyServerType) => {
       reply.status(400);
       return {
         statusCode: 400 as const,
-        error: {
-          message: "org is not a valid organization name"
-        }
+        error: "Bad Request",
+        message: "org is not a valid organization name"
       };
     }
 

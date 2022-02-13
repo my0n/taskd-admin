@@ -6,7 +6,7 @@ import path from "path/posix";
 import { rootDataDir } from "../config";
 
 const cmd = (args: string[], cwd?: string): Promise<{ stdout: string; stderr: string; code: number | null }> => {
-  return new Promise((res) => {
+  return new Promise((res, rej) => {
     console.log(`cmd: ${JSON.stringify(args)}`);
     let stdout = "";
     let stderr = "";
@@ -23,6 +23,9 @@ const cmd = (args: string[], cwd?: string): Promise<{ stdout: string; stderr: st
         stderr,
         code
       });
+    });
+    command.on("error", error => {
+      rej(error);
     });
   });
 };

@@ -1,10 +1,11 @@
 import { Static, Type } from "@sinclair/typebox";
 import { orgExists } from "../files/fileApi";
 import { isValidIdentifier } from "../validation/isValidIdentifier";
-import { EndpointValidationError } from "./EndpointValidationErrorType";
+import { EndpointNotFoundError } from "./EndpointNotFoundErrorType";
 import { EndpointUser } from "./EndpointUserType";
 import { FastifyServerType } from "./FastifyServerType";
 import { createUser, generateCert } from "../taskd/taskdApi";
+import { EndpointBadRequestError } from "./EndpointBadRequestErrorType";
 
 const CreateUserParams = Type.Object({
   org: Type.String()
@@ -21,14 +22,8 @@ const CreateUserReply = Type.Union([
     statusCode: Type.Literal(200),
     user: EndpointUser
   }),
-  Type.Object({
-    statusCode: Type.Literal(400),
-    error: EndpointValidationError
-  }),
-  Type.Object({
-    statusCode: Type.Literal(404),
-    error: EndpointValidationError
-  })
+  EndpointNotFoundError,
+  EndpointBadRequestError
 ]);
 type CreateUserReplyType = Static<typeof CreateUserReply>;
 
@@ -42,9 +37,8 @@ export const createUserEndpoint = (server: FastifyServerType) => {
       reply.status(400);
       return {
         statusCode: 400 as const,
-        error: {
-          message: "org is not a valid organization name"
-        }
+        error: "Bad Request",
+        message: "org is not a valid organization name"
       };
     }
 
@@ -52,9 +46,8 @@ export const createUserEndpoint = (server: FastifyServerType) => {
       reply.status(400);
       return {
         statusCode: 400 as const,
-        error: {
-          message: "name is not a valid username"
-        }
+        error: "Bad Request",
+        message: "name is not a valid username"
       };
     }
 
@@ -62,9 +55,8 @@ export const createUserEndpoint = (server: FastifyServerType) => {
       reply.status(404);
       return {
         statusCode: 404 as const,
-        error: {
-          message: "org does not exist"
-        }
+        error: "Not Found",
+        message: "org does not exist"
       };
     }
 
