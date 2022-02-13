@@ -30,7 +30,7 @@ jobs:
       id: package-version
       uses: martinbeentjes/npm-get-version-action@v1.1.0
       with:
-        path: ./package.json
+        path: .
 
     - name: Build and push docker taskd-admin
       if: github.ref == 'refs/heads/master'
