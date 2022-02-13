@@ -2,6 +2,7 @@
 .git
 .gitignore
 .github
+.vscode
 dist
 Dockerfile
 node_modules

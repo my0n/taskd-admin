@@ -1,21 +1,22 @@
 import fastify from "fastify";
-import { Static, Type } from "@sinclair/typebox";
-import { getOrgs } from "./fileApi";
+import { host, port } from "./config";
+import { getOrgsEndpoint } from "./server/getOrgsEndpoint";
+import { getUsersEndpoint } from "./server/getUsersEndpoint";
+import { createOrgEndpoint } from "./server/createOrgEndpoint";
+import { createUserEndpoint } from "./server/createUserEndpoint";
+import { getUserCertPemEndpoint } from "./server/getUserCertPemEndpoint";
+import { getUserKeyPemEndpoint } from "./server/getUserKeyPemEndpoint";
 
-const port = 8080;
-const host = "0.0.0.0";
-
-const server = fastify();
-
-const OrgList = Type.Array(Type.Object({
-  name: Type.String()
-}));
-type OrgListType = Static<typeof OrgList>;
-server.get<{
-  Reply: OrgListType;
-}>("/orgs", (request, reply) => {
-  return getOrgs();
+const server = fastify({
+  logger: true
 });
+
+getOrgsEndpoint(server);
+getUsersEndpoint(server);
+createOrgEndpoint(server);
+createUserEndpoint(server);
+getUserCertPemEndpoint(server);
+getUserKeyPemEndpoint(server);
 
 server.get<{
   Reply: string;
