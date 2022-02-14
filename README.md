@@ -12,5 +12,5 @@ docker run -d --name taskd-admin \
 Run tests:
 ```
 docker build -t local . --target=test
-docker run local
+docker run --rm local
 ```

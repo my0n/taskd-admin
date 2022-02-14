@@ -17,15 +17,6 @@ COPY ./api/jest.config.js ./jest.config.js
 COPY ./api/tsconfig.json ./tsconfig.json
 RUN npm run build
 
-# web
-WORKDIR /taskd-admin/web
-COPY ./web/package*.json ./
-RUN npm ci
-COPY ./web/public ./public
-COPY ./web/src ./src
-COPY ./web/tsconfig.json ./tsconfig.json
-RUN npm run build
-
 FROM base as test
 WORKDIR /taskd-admin
 COPY ./eng/docker-entrypoint.test.sh ./entrypoint.sh
