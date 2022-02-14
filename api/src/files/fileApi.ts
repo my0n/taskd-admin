@@ -6,9 +6,9 @@ import { assertValidIdentifier } from "../validation/assertValidIdentifier";
 import { parseUserConfigFile } from "./parseUserConfigFile";
 
 const orgsDir = path.join(rootDataDir, "orgs");
-const pkisDir = path.join(rootDataDir, "pkis");
-const userCertPemFile = (uuid: string) => path.join(rootDataDir, "pkis", `generated-${uuid}.cert.pem`);
-const userKeyPemFile = (uuid: string) => path.join(rootDataDir, "pkis", `generated-${uuid}.key.pem`);
+const pkiDir = path.join(rootDataDir, "pki");
+const userCertPemFile = (uuid: string) => path.join(rootDataDir, "pki", `generated-${uuid}.cert.pem`);
+const userKeyPemFile = (uuid: string) => path.join(rootDataDir, "pki", `generated-${uuid}.key.pem`);
 const usersDir = (org: string) => path.join(rootDataDir, "orgs", org, "users");
 const userConfigFile = (org: string, user: string) => path.join(rootDataDir, "orgs", org, "users", user, "config");
 
@@ -70,7 +70,7 @@ export const userExists = async (org: string, uuid: string): Promise<boolean> =>
 
 export const getCertPem = async (uuid: string): Promise<string | null> => {
   assertValidIdentifier("uuid", uuid);
-  const files = await readdir(pkisDir);
+  const files = await readdir(pkiDir);
   if (!files.some(o => o === `generated-${uuid}.cert.pem`)) {
     return null;
   }
@@ -81,7 +81,7 @@ export const getCertPem = async (uuid: string): Promise<string | null> => {
 
 export const getKeyPem = async (uuid: string): Promise<string | null> => {
   assertValidIdentifier("uuid", uuid);
-  const files = await readdir(pkisDir);
+  const files = await readdir(pkiDir);
   if (!files.some(o => o === `generated-${uuid}.key.pem`)) {
     return null;
   }
