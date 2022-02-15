@@ -7,6 +7,7 @@ import { parseUserConfigFile } from "./parseUserConfigFile";
 
 const orgsDir = path.join(rootDataDir, "orgs");
 const pkiDir = path.join(rootDataDir, "pki");
+const caCertPemFile = () => path.join(rootDataDir, "pki", `ca.cert.pem`);
 const userCertPemFile = (uuid: string) => path.join(rootDataDir, "pki", `generated-${uuid}.cert.pem`);
 const userKeyPemFile = (uuid: string) => path.join(rootDataDir, "pki", `generated-${uuid}.key.pem`);
 const usersDir = (org: string) => path.join(rootDataDir, "orgs", org, "users");
@@ -68,7 +69,17 @@ export const userExists = async (org: string, uuid: string): Promise<boolean> =>
   return uuids.some(o => o === uuid);
 };
 
-export const getCertPem = async (uuid: string): Promise<string | null> => {
+export const getCaCertPem = async (): Promise<string | null> => {
+  const files = await readdir(pkiDir);
+  if (!files.some(o => o === `ca.cert.pem`)) {
+    return null;
+  }
+
+  const contentsStream = await readFile(caCertPemFile());
+  return contentsStream.toString();
+};
+
+export const getUserCertPem = async (uuid: string): Promise<string | null> => {
   assertValidIdentifier("uuid", uuid);
   const files = await readdir(pkiDir);
   if (!files.some(o => o === `generated-${uuid}.cert.pem`)) {
@@ -79,7 +90,7 @@ export const getCertPem = async (uuid: string): Promise<string | null> => {
   return contentsStream.toString();
 };
 
-export const getKeyPem = async (uuid: string): Promise<string | null> => {
+export const getUserKeyPem = async (uuid: string): Promise<string | null> => {
   assertValidIdentifier("uuid", uuid);
   const files = await readdir(pkiDir);
   if (!files.some(o => o === `generated-${uuid}.key.pem`)) {

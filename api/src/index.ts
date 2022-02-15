@@ -6,11 +6,13 @@ import { createOrgEndpoint } from "./server/createOrgEndpoint";
 import { createUserEndpoint } from "./server/createUserEndpoint";
 import { getUserCertPemEndpoint } from "./server/getUserCertPemEndpoint";
 import { getUserKeyPemEndpoint } from "./server/getUserKeyPemEndpoint";
+import { getCaCertPemEndpoint } from "./server/getCaCertPemEndpoint";
 
 const server = fastify({
   logger: true
 });
 
+getCaCertPemEndpoint(server);
 getOrgsEndpoint(server);
 getUsersEndpoint(server);
 createOrgEndpoint(server);

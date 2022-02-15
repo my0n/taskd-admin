@@ -30,7 +30,7 @@ export const createOrgEndpoint = (server: FastifyServerType) => {
       return {
         statusCode: 400 as const,
         error: "Bad Request",
-        message: "org is not a valid organization name"
+        message: `org '${request.body.name}' is not a valid org name`
       };
     }
 
@@ -39,7 +39,7 @@ export const createOrgEndpoint = (server: FastifyServerType) => {
       return {
         statusCode: 400 as const,
         error: "Bad Request",
-        message: "org already exists"
+        message: `org '${request.body.name}' already exists`
       }
     }
 

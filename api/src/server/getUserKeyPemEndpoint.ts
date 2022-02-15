@@ -1,7 +1,6 @@
 import { Static, Type } from "@sinclair/typebox";
-import { getKeyPem, orgExists, userExists } from "../files/fileApi";
+import { getUserKeyPem, orgExists, userExists } from "../files/fileApi";
 import { isValidIdentifier } from "../validation/isValidIdentifier";
-import { EndpointBadRequestError } from "./EndpointBadRequestErrorType";
 import { EndpointNotFoundError } from "./EndpointNotFoundErrorType";
 import { FastifyServerType } from "./FastifyServerType";
 
@@ -13,8 +12,7 @@ type UserKeyPemParamsType = Static<typeof UserKeyPemParams>;
 
 const UserKeyPemReply = Type.Union([
   Type.String(),
-  EndpointNotFoundError,
-  EndpointBadRequestError
+  EndpointNotFoundError
 ]);
 type UserKeyPemReplyType = Static<typeof UserKeyPemReply>;
 
@@ -23,43 +21,25 @@ export const getUserKeyPemEndpoint = (server: FastifyServerType) => {
     Params: UserKeyPemParamsType;
     Reply: UserKeyPemReplyType;
   }>("/orgs/:org/users/:uuid/key.pem", async (request, reply) => {
-    if (!isValidIdentifier(request.params.org)) {
-      reply.status(400);
-      return {
-        statusCode: 400 as const,
-        error: "Bad Request",
-        message: "org is not a valid organization name"
-      };
-    }
-
-    if (!isValidIdentifier(request.params.uuid)) {
-      reply.status(400);
-      return {
-        statusCode: 400 as const,
-        error: "Bad Request",
-        message: "uuid is not a valid uuid"
-      };
-    }
-
-    if (!await orgExists(request.params.org)) {
+    if (!isValidIdentifier(request.params.org) || !await orgExists(request.params.org)) {
       reply.status(404);
       return {
         statusCode: 404 as const,
         error: "Not Found",
-        message: "org does not exist"
+        message: `org '${request.params.org}' does not exist`
       };
     }
 
-    if (!await userExists(request.params.org, request.params.uuid)) {
+    if (!isValidIdentifier(request.params.uuid) || !await userExists(request.params.org, request.params.uuid)) {
       reply.status(404);
       return {
         statusCode: 404 as const,
         error: "Not Found",
-        message: "uuid does not exist"
+        message: `uuid '${request.params.uuid}' does not exist in org '${request.params.org}'`
       };
     }
 
-    const pem = await getKeyPem(request.params.uuid);
+    const pem = await getUserKeyPem(request.params.uuid);
 
     if (!pem) {
       reply.status(404);

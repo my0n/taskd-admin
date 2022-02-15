@@ -33,30 +33,21 @@ export const createUserEndpoint = (server: FastifyServerType) => {
     Body: CreateUserBodyType;
     Reply: CreateUserReplyType;
   }>("/orgs/:org/users", async (request, reply) => {
-    if (!isValidIdentifier(request.params.org)) {
-      reply.status(400);
-      return {
-        statusCode: 400 as const,
-        error: "Bad Request",
-        message: "org is not a valid organization name"
-      };
-    }
-
     if (!isValidIdentifier(request.body.name)) {
       reply.status(400);
       return {
         statusCode: 400 as const,
         error: "Bad Request",
-        message: "name is not a valid username"
+        message: `name '${request.body.name}' is not a valid username`
       };
     }
 
-    if (!await orgExists(request.params.org)) {
+    if (!isValidIdentifier(request.params.org) || !await orgExists(request.params.org)) {
       reply.status(404);
       return {
         statusCode: 404 as const,
         error: "Not Found",
-        message: "org does not exist"
+        message: `org '${request.params.org}' does not exist`
       };
     }
 
