@@ -1,6 +1,6 @@
 {
   "name": "taskd-admin",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An admin API for taskd",
   "main": "./dist/index.js",
   "files": [
