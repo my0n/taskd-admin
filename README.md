@@ -28,7 +28,7 @@ Environment variables specific to taskd-admin:
 
 | Name | Default | Description |
 | ---- | ------- | ----------- |
-| `TASKD_ADMIN_ENABLED` | `""` | Enable the taskd-admin REST API? 1 = yes. |
+| `TASKD_ADMIN_ENABLED` | `""` | Enable the taskd-admin REST API? 1 = yes. Defaults to no. |
 | `TASKD_ADMIN_USER` | `"admin"` | Admin username for the REST API. |
 | `TASKD_ADMIN_PASS` | `"password"` | Admin password for the REST API. |
 
