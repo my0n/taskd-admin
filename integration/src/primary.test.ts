@@ -4,31 +4,46 @@ const baseUrl = "http://127.0.0.1:8080";
 
 const getOrgList = async () => {
   return await fetch(`${baseUrl}/orgs`, {
-    method: "GET"
+    method: "GET",
+    headers: {
+      "Authorization": "Basic YWRtaW46cGFzc3dvcmQ="
+    }
   }).then(r => r.json());
 };
 
 const getUserList = async (org: string) => {
   return await fetch(`${baseUrl}/orgs/${org}/users`, {
-    method: "GET"
+    method: "GET",
+    headers: {
+      "Authorization": "Basic YWRtaW46cGFzc3dvcmQ="
+    }
   }).then(r => r.json());
 };
 
 const getCaCertPem = async () => {
   return await fetch(`${baseUrl}/ca.cert.pem`, {
-    method: "GET"
+    method: "GET",
+    headers: {
+      "Authorization": "Basic YWRtaW46cGFzc3dvcmQ="
+    }
   }).then(r => r.text());
 };
 
 const getUserCertPem = async (org: string, uuid: string) => {
   return await fetch(`${baseUrl}/orgs/${org}/users/${uuid}/cert.pem`, {
-    method: "GET"
+    method: "GET",
+    headers: {
+      "Authorization": "Basic YWRtaW46cGFzc3dvcmQ="
+    }
   }).then(r => r.text());
 };
 
 const getUserKeyPem = async (org: string, uuid: string) => {
   return await fetch(`${baseUrl}/orgs/${org}/users/${uuid}/key.pem`, {
-    method: "GET"
+    method: "GET",
+    headers: {
+      "Authorization": "Basic YWRtaW46cGFzc3dvcmQ="
+    }
   }).then(r => r.text());
 };
 
@@ -37,7 +52,8 @@ const createOrg = async (name: string) => {
     method: "POST",
     body: JSON.stringify({ name }),
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": "Basic YWRtaW46cGFzc3dvcmQ="
     }
   }).then(r => r.json());
 };
@@ -47,12 +63,64 @@ const createUser = async (org: string, name: string) => {
     method: "POST",
     body: JSON.stringify({ name }),
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": "Basic YWRtaW46cGFzc3dvcmQ="
     }
   }).then(r => r.json());
 };
 
 describe("primary test suite", () => {
+  // unauthorized
+  test("no auth header is unauthorized", async () => {
+    const result = await fetch(`${baseUrl}/orgs`, {
+      method: "GET"
+    }).then(r => r.json());
+    expect(result).toEqual({
+      statusCode: 401,
+      error: "Unauthorized",
+      message: "Unauthorized"
+    });
+  });
+  test("incorrect user and pass is unauthorized", async () => {
+    const result = await fetch(`${baseUrl}/orgs`, {
+      method: "GET",
+      headers: {
+        "Authorization": "Basic YmlsbDpnYXRlcw=="
+      }
+    }).then(r => r.json());
+    expect(result).toEqual({
+      statusCode: 401,
+      error: "Unauthorized",
+      message: "Unauthorized"
+    });
+  });
+  test("incorrect user but correct pass is unauthorized", async () => {
+    const result = await fetch(`${baseUrl}/orgs`, {
+      method: "GET",
+      headers: {
+        "Authorization": "Basic YmlsbDpwYXNzd29yZA=="
+      }
+    }).then(r => r.json());
+    expect(result).toEqual({
+      statusCode: 401,
+      error: "Unauthorized",
+      message: "Unauthorized"
+    });
+  });
+  test("correct user but incorrect pass is unauthorized", async () => {
+    const result = await fetch(`${baseUrl}/orgs`, {
+      method: "GET",
+      headers: {
+        "Authorization": "Basic YWRtaW46Z2F0ZXM="
+      }
+    }).then(r => r.json());
+    expect(result).toEqual({
+      statusCode: 401,
+      error: "Unauthorized",
+      message: "Unauthorized"
+    });
+  });
+
   // get server credentials
   test("get the ca.cert.pem", async () => {
     const certPem = await getCaCertPem();

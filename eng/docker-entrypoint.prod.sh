@@ -1,12 +1,22 @@
 #!/bin/bash
 
-# taskd-admin
-node ./api/dist/index.js &
+if [[ $TASKD_ADMIN_ENABLED -eq 1 ]]
+then
 
-# taskd
-/entrypoint.sh $@ &
+    # taskd-admin
+    node ./api/dist/index.js &
 
-# exit on first fail
-wait -n
+    # taskd
+    /entrypoint.sh $@ &
 
-exit $?
+    # exit on first fail
+    wait -n
+
+    exit $?
+
+else
+
+    # taskd
+    /entrypoint.sh $@
+
+fi
